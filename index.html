@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <title>calculate</title>
+
+</head>
+
+<body>
+
+    <div id="app">
+        <div class='container'>
+            <div class='display'>
+                <p>{{answer}}</p>
+                <p>{{this.list | list}}</p>
+            </div>
+
+            <div class='panel'>
+                <row-calculate class='row__with-zero' v-for='row in rows' @add='add' :chars='row'></row-calculate>
+                <!-- <div class='row__btn-zero' class='row'>
+                    <div class='row__btn'>
+                        <p>0</p>
+                    </div>
+                    <div class='row__btn'>
+                        <p>,</p>
+                    </div>
+                    <div @click='calculate' class='row__btn'>
+                        <p>=</p>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <script src='constants.js'></script>
+    <script src='row-component.js'></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                rows,
+                list: [],
+                answer: undefined,
+                set: new Set('*', '/', '+/-')
+            },
+            computed: {
+                computedTable() {
+                    return this.list || 0
+                }
+            },
+            methods: {
+                checkChar(value) {
+                    return this.set.has(value)
+                },
+                joinList() {
+                    return this.list.join('')
+                },
+                add(value) {
+                    switch (value) {
+                        case 'C':
+                            this.list.pop();
+                            break;
+                        case '%':
+                            const percent = this.joinList() / 100
+                            this.answer = percent
+                            this.list = [percent]
+                            break;
+                        case '+/-':
+
+                            break;
+
+                        default: this.list.push(value)
+                    }
+                },
+                calculate() {
+                    if (this.list.length == 0) {
+                        this.table = 'Array is empty'
+                    }
+                    try {
+                        let string = this.joinList()
+
+                        if (!this.checkChar(string[0])) {
+                            this.answer = (new Function(`return ${string}`))()
+                            this.list = [this.answer]
+                        } else {
+                            this.answer = 'Syntax Error'
+                        }
+
+                    }
+                    catch (error) {
+                        this.answer = 'Syntax Error'
+                    }
+
+                }
+            },
+            filters: {
+                list(value) {
+                    return value != 0 ? value.join('') : 0
+                }
+            }
+        });
+
+
+
+    </script>
+</body>
+
+</html>
